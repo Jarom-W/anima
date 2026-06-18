@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/Jarom-W/Anima.git
     targetRevision: HEAD
-    path: apps/first-app/base
+    path: apps/first-app
 
   destination:
     server: https://kubernetes.default.svc
