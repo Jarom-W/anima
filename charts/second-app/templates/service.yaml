@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app.name }}
+  name: second-app
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: {{ .Values.app.name }}
+    app: second-app
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 80
+      targetPort: 3000

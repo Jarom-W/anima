@@ -1,6 +1,6 @@
 apiVersion: v2
 name: second-app
-description: A simple Helm chart for learning.
+description: Basic Helm chart for demonstration
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
