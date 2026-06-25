@@ -39,4 +39,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}/second-app:${{ steps.vars.outputs.sha }}
+          tags: ghcr.io/jarom-w/anima-second-app:${{ steps.vars.outputs.sha }}
