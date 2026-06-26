@@ -43,8 +43,8 @@ jobs:
           body: |
             Automated promotion
 
-          Source: ${{ inputs.source_env }}
-          Target: ${{ inputs.target_env }}
+            Source: ${{ inputs.source_env }}
+            Target: ${{ inputs.target_env }}
 
-        branch: promote-${{ inputs.source_env }}-to-${{ inputs.target_env }}
-        commit-message: "chore: promote $${{ inputs.source_env }} -> ${{ inputs.target_env }}"
+          branch: promote-${{ inputs.source_env }}-to-${{ inputs.target_env }}
+          commit-message: "chore: promote $${{ inputs.source_env }} -> ${{ inputs.target_env }}"
