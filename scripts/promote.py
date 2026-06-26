@@ -4,70 +4,87 @@ import yaml
 import subprocess
 import os
 
-source = sys.argv[1]   # dev
-dest = sys.argv[2]     # staging
 
-repo_root = Path.cwd()
+def run(cmd, cwd):
+    """Small wrapper so every git call is deterministic."""
+    subprocess.run(cmd, cwd=cwd, check=True)
 
-source_file = repo_root / f"charts/second-app/env/{source}/values.yaml"
-dest_file = repo_root / f"charts/second-app/env/{dest}/values.yaml"
 
-# 1. read source
-with open(source_file) as f:
-    source_values = yaml.safe_load(f)
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: promote.py <source_env> <target_env>")
+        sys.exit(1)
 
-tag = source_values["image"]["tag"]
+    source = sys.argv[1]   # dev
+    dest = sys.argv[2]     # staging
 
-print(f"Promoting image {tag} from {source} → {dest}")
+    # Always anchor to GitHub workspace (critical fix)
+    repo_root = Path(os.environ.get("GITHUB_WORKSPACE", Path.cwd()))
 
-# 2. create branch
-branch = f"promote-{source}-to-{dest}-{tag}"
+    source_file = repo_root / f"charts/second-app/env/{source}/values.yaml"
+    dest_file = repo_root / f"charts/second-app/env/{dest}/values.yaml"
 
-subprocess.run(["git", "checkout", "-b", branch], check=True)
+    if not source_file.exists():
+        raise FileNotFoundError(f"Source file not found: {source_file}")
 
-# 3. update destination file
-with open(dest_file) as f:
-    dest_values = yaml.safe_load(f)
+    if not dest_file.exists():
+        raise FileNotFoundError(f"Destination file not found: {dest_file}")
 
-dest_values["image"]["tag"] = tag
+    # ---------------------------
+    # Read source image tag
+    # ---------------------------
+    with open(source_file) as f:
+        source_values = yaml.safe_load(f)
 
-with open(dest_file, "w") as f:
-    yaml.safe_dump(dest_values, f, sort_keys=False)
+    tag = source_values["image"]["tag"]
 
-# 4. commit
-subprocess.run(["git", "add", str(dest_file)], check=True)
-subprocess.run(["git", "commit", "-m", f"promote {tag} {source} → {dest}"], check=True)
+    print(f"Promoting image {tag} from {source} → {dest}")
 
-# 5. push branch
-subprocess.run(["git", "push", "-u", "origin", branch], check=True)
+    # ---------------------------
+    # Configure git identity
+    # MUST happen before any git command
+    # ---------------------------
+    run(["git", "config", "user.name", "github-actions[bot]"], repo_root)
+    run(
+        ["git", "config", "user.email", "github-actions[bot]@users.noreply.github.com"],
+        repo_root
+    )
 
-print(f"""
-Created promotion branch: {branch}
+    # ---------------------------
+    # Create branch
+    # ---------------------------
+    branch = f"promote-{source}-to-{dest}-{tag}"
 
-Next step:
-Open PR from {branch} → main
-""")
-import sys
-import yaml
+    run(["git", "checkout", "-b", branch], repo_root)
 
-source = sys.argv[1]
-dest = sys.argv[2]
+    # ---------------------------
+    # Update destination values.yaml
+    # ---------------------------
+    with open(dest_file) as f:
+        dest_values = yaml.safe_load(f)
 
-source_file = Path(f"charts/second-app/env/{source}/values.yaml")
-dest_file = Path(f"charts/second-app/env/{dest}/values.yaml")
+    dest_values["image"]["tag"] = tag
 
-with open(source_file) as f:
-    source_values = yaml.safe_load(f)
+    with open(dest_file, "w") as f:
+        yaml.safe_dump(dest_values, f, sort_keys=False)
 
-with open(dest_file) as f:
-    dest_values = yaml.safe_load(f)
+    # ---------------------------
+    # Commit changes
+    # ---------------------------
+    run(["git", "add", str(dest_file)], repo_root)
+    run(["git", "commit", "-m", f"promote {tag} {source} → {dest}"], repo_root)
 
-dest_values["image"]["tag"] = source_values["image"]["tag"]
+    # ---------------------------
+    # Push branch
+    # ---------------------------
+    run(["git", "push", "-u", "origin", branch], repo_root)
 
-with open(dest_file, "w") as f:
-    yaml.safe_dump(dest_values, f, sort_keys=False)
+    print("\n✅ Promotion complete")
+    print(f"Branch: {branch}")
+    print(f"Source: {source} → Target: {dest}")
+    print(f"Image tag: {tag}")
+    print("\nNext step: open PR into main")
 
-print(
-    f"Promoted {source_values['image']['tag']} "
-    f"from {source} to {dest}"
-)
+
+if __name__ == "__main__":
+    main()
