@@ -12,7 +12,7 @@ spec:
     path: charts/second-app
     helm:
       valueFiles:
-        - ../../gitops/environments/dev/second-app.yaml
+        - env/dev/values.yaml
 
   destination:
     server: https://kubernetes.default.svc
