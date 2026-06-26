@@ -12,6 +12,7 @@ spec:
     path: charts/second-app
     helm:
       valueFiles:
+        - values.yaml
         - env/dev/values.yaml
 
   destination:
