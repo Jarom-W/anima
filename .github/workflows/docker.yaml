@@ -41,4 +41,16 @@ jobs:
           push: true
           tags: ghcr.io/jarom-w/anima-second-app:${{ steps.vars.outputs.sha }}
 
+      - name: Update DEV GitOps
+        run: |
+          sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/" charts/second-app/env/dev/values.yaml
+
+      - name: Commit DEV update
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add charts/second-app/env/dev/values.yaml
+          git commit -m "dev: deploy ${{ steps.vars.outputs.sha }}"
+          git push
+
 
