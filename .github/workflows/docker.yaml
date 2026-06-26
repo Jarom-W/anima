@@ -42,8 +42,7 @@ jobs:
           tags: ghcr.io/jarom-w/anima-second-app:${{ steps.vars.outputs.sha }}
 
       - name: Update GitOps image tag
-        run: |
-          sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/" gitops/environments/dev/second-app.yaml
+        run: | sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/" charts/second-app/env/dev/values.yaml
 
       - name: Commit GitOps update
         run: |
