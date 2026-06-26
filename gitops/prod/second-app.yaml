@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: second-app
+  name: second-app-prod
   namespace: argocd
 spec:
   project: default
@@ -12,12 +12,11 @@ spec:
     path: charts/second-app
     helm:
       valueFiles:
-        - values.yaml
-        - env/dev/values.yaml
+        - env/prod/values.yaml
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: second-app
+    namespace: prod
 
   syncPolicy:
     automated:
