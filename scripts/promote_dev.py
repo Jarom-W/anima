@@ -3,7 +3,7 @@ import base64
 import requests
 
 REPO = "Jarom-W/Anima"
-PATH = "gitops/dev/values.yaml"
+PATH = "charts/second-app/env/dev/values.yaml"
 BRANCH = f"ci/promote-dev-{os.environ['SHA']}"
 SHA = os.environ["SHA"]
 TOKEN = os.environ["GH_TOKEN"]
