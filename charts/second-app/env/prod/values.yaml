@@ -1,9 +1,4 @@
 image:
   repository: ghcr.io/jarom-w/anima-second-app
-<<<<<<< HEAD
-  tag: 83a733d
-replicaCount: 3
-=======
   tag: c805a0a
-replicaCount: 5
->>>>>>> b786b0888d4c223300efacfa9d532c2ff38c0005
+replicaCount: 3
